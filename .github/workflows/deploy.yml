@@ -3,7 +3,7 @@ name: Deploy to Cloudflare Pages
 on:
   push:
     tags:
-      - 'v*' # 匹配所有以 v 开头的 tag，如 v1.0.0, v1.2.3 等
+      - 'v*'
 
 jobs:
   deploy:
@@ -31,6 +31,6 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: cigol
+          projectName: cigol # 确保与 Cloudflare Pages 项目名称一致（小写）
           directory: out
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
