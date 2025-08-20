@@ -1,0 +1,110 @@
+@import "tailwindcss";
+
+:root {
+--primary-blue: #1E3A8A;
+--accent-orange: #F97316;
+--accent-orange-light: #FB923C;
+--accent-orange-dark: #EA580C;
+--background-start: #FFFFFF;
+--background-mid: #F3F4F6;
+--background-end: #E5E7EB;
+--foreground: #222222;
+--foreground-secondary: #444444;
+--neutral-light: #F3F4F6;
+--neutral-dark: #1F2937;
+--neutral-gray: #6B7280;
+--neutral-border: #D1D5DB;
+--font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+--font-mono: "Geist Mono", "Fira Code", monospace;
+}
+
+.dark {
+--background-start: #0A0A0A;
+--background-mid: #1E1E2E;
+--background-end: #1E3A8A;
+--foreground: #EDEDED;
+--foreground-secondary: #CCCCCC;
+--neutral-light: #1F2937;
+--neutral-dark: #111827;
+--neutral-gray: #9CA3AF;
+--neutral-border: #374151;
+}
+
+@theme inline {
+--color-background: var(--background-start);
+--color-foreground: var(--foreground);
+--color-primary: var(--primary-blue);
+--color-accent: var(--accent-orange);
+--font-sans: var(--font-sans);
+--font-mono: var(--font-mono);
+}
+
+/* 修复：添加了body选择器 */
+body {
+background: var(--background-start);
+color: var(--foreground);
+font-family: var(--font-sans);
+-webkit-font-smoothing: antialiased;
+-moz-osx-font-smoothing: grayscale;
+transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+color: var(--foreground);
+}
+
+p,
+span,
+li,
+label,
+input,
+textarea {
+color: var(--foreground-secondary);
+}
+
+/* 修复：删除了多余的闭合大括号 */
+
+/* 动画效果 */
+@keyframes fadeIn {
+from {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+to {
+  opacity: 1;
+  transform: translateY(0);
+}
+}
+
+.animate-fade-in {
+animation: fadeIn 0.8s ease-out forwards;
+}
+
+/* 自定义滚动条 */
+::-webkit-scrollbar {
+width: 8px;
+}
+
+::-webkit-scrollbar-track {
+background: var(--neutral-light);
+}
+
+::-webkit-scrollbar-thumb {
+background: var(--accent-orange);
+border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+background: var(--accent-orange-dark);
+}
+
+/* 额外美观优化：平滑过渡 */
+* {
+transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+}
