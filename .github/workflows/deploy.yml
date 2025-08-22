@@ -2,8 +2,10 @@ name: Deploy to Cloudflare Pages
 
 on:
   push:
+    branches:
+      - main # 触发生产部署的分支
     tags:
-      - 'v*'
+      - 'v*' # 保留标签触发以支持版本发布
 
 jobs:
   deploy:
@@ -31,6 +33,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: cigol # 确保与 Cloudflare Pages 项目名称一致（小写）
+          projectName: cigol
           directory: out
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          branch: main # 明确指定生产分支
