@@ -33,7 +33,9 @@ export type FontFamily =
   | 'Monaco'
   | 'Consolas'
   | 'Ubuntu Mono'
-  | 'Roboto Mono';
+  | 'Roboto Mono'
+  | 'Victor Mono'
+  | 'Pacifico';
 
 /**
  * Preview mode for responsive design

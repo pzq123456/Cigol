@@ -6,12 +6,6 @@ import { createHighlightService } from '../../services/highlight';
 import { WindowStyle } from '../../types/theme';
 
 /**
- * A marker to identify this component for homepage rendering.
- * @type {string}
- */
-// const data-export-targt = 'data-export-target';
-
-/**
  * Window controls component for different OS styles
  */
 const WindowControls: React.FC<{ style: WindowStyle; className?: string }> = React.memo(({
@@ -150,7 +144,7 @@ const LineNumbers: React.FC<{
     <div
       className="flex flex-col text-right pr-2 sm:pr-4 py-4 border-r border-opacity-20 border-gray-500 select-none flex-shrink-0"
       style={{
-        fontSize: `${fontSize}px`, // Use the same font size as the code content
+        fontSize: `${fontSize}px`,
         lineHeight: lineHeight,
         color: theme.colors.comment,
         minWidth: `${lineNumberWidth * 0.6 + 0.5}rem`
@@ -162,7 +156,7 @@ const LineNumbers: React.FC<{
         <span
           key={index + 1}
           className="font-mono leading-none"
-          style={{ lineHeight: lineHeight }} // Ensure line height consistency
+          style={{ lineHeight: lineHeight }}
           aria-hidden="true"
         >
           {index + 1}
@@ -222,7 +216,8 @@ const ErrorFallback: React.FC<{
   code: string;
   settings: any;
   onRetry: () => void;
-}> = ({ error, code, settings, onRetry }) => (
+  dynamicFontClass: string;
+}> = ({ error, code, settings, onRetry, dynamicFontClass }) => (
   <div
     className="rounded-lg overflow-hidden border-2 border-red-300 dark:border-red-700"
     style={{
@@ -257,7 +252,7 @@ const ErrorFallback: React.FC<{
     {/* Plain text fallback */}
     <div className="mt-4 border-t border-gray-300 dark:border-gray-600 pt-4">
       <pre
-        className="font-mono text-sm whitespace-pre-wrap break-words"
+        className={`font-mono text-sm whitespace-pre-wrap break-words ${dynamicFontClass}`}
         style={{
           fontSize: `${settings.fontSize}px`,
           lineHeight: settings.lineHeight,
@@ -270,17 +265,23 @@ const ErrorFallback: React.FC<{
   </div>
 );
 
+// 确保 props 类型包含 dynamicFontClass
+interface CodePreviewWithFontProps extends CodePreviewProps {
+  dynamicFontClass: string;
+}
+
 /**
  * CodePreview component for displaying beautified code with syntax highlighting
  */
-export const CodePreview: React.FC<CodePreviewProps> = ({
+export const CodePreview: React.FC<CodePreviewWithFontProps> = ({
   code,
   language,
   theme,
   settings,
   isExporting = false,
   className = '',
-  onPreviewReady
+  onPreviewReady,
+  dynamicFontClass
 }) => {
   const [highlightedCode, setHighlightedCode] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
@@ -290,7 +291,7 @@ export const CodePreview: React.FC<CodePreviewProps> = ({
   const previewRef = useRef<HTMLDivElement>(null);
   const highlightService = createHighlightService();
 
-  // Highlight code when dependencies change
+  // Highlight code with dynamic font class
   const highlightCode = useCallback(async () => {
     if (!code.trim()) {
       setHighlightedCode('');
@@ -302,30 +303,20 @@ export const CodePreview: React.FC<CodePreviewProps> = ({
     setError(null);
 
     try {
-      const highlighted = await highlightService.highlightCode(code, language, theme);
+      // 确保 highlightService 将 dynamicFontClass 应用到生成的 HTML
+      const highlighted = await highlightService.highlightCode(code, language, theme, dynamicFontClass);
       setHighlightedCode(highlighted);
 
-      // Notify parent that preview is ready
       if (onPreviewReady) {
-        setTimeout(onPreviewReady, 100); // Small delay to ensure DOM is updated
+        setTimeout(onPreviewReady, 100);
       }
     } catch (err) {
       console.error('Failed to highlight code:', err);
       setError(err instanceof Error ? err : new Error('Unknown highlighting error'));
-
-      // Create fallback highlighted code
-      const escapedCode = code
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-
-      setHighlightedCode(`<pre><code>${escapedCode}</code></pre>`);
     } finally {
       setIsLoading(false);
     }
-  }, [code, language, theme, highlightService, onPreviewReady]);
+  }, [code, language, theme, highlightService, onPreviewReady, dynamicFontClass]);
 
   // Retry highlighting
   const handleRetry = useCallback(() => {
@@ -336,12 +327,12 @@ export const CodePreview: React.FC<CodePreviewProps> = ({
   // Effect to trigger highlighting
   useEffect(() => {
     highlightCode();
-  }, [highlightCode]);
+  }, [highlightCode, retryCount]);
 
-  // Calculate dynamic styles with mobile responsiveness
+  // Calculate dynamic styles
   const containerStyle = useMemo(() => ({
     backgroundColor: settings.backgroundColor,
-    padding: `${Math.max(8, settings.padding)}px`, // Minimum padding for mobile
+    padding: `${Math.max(8, settings.padding)}px`,
     borderRadius: `${settings.borderRadius}px`,
     maxWidth: settings.maxWidth ? `${settings.maxWidth}px` : undefined,
     maxHeight: settings.maxHeight ? `${settings.maxHeight}px` : undefined,
@@ -349,24 +340,22 @@ export const CodePreview: React.FC<CodePreviewProps> = ({
   }), [settings.backgroundColor, settings.padding, settings.borderRadius, settings.maxWidth, settings.maxHeight]);
 
   const codeStyle = useMemo(() => ({
-    fontSize: `${Math.max(10, settings.fontSize)}px`, // Minimum font size for readability
-    fontFamily: settings.fontFamily,
+    fontSize: `${Math.max(10, settings.fontSize)}px`,
     lineHeight: settings.lineHeight,
     tabSize: settings.tabSize,
     whiteSpace: settings.wordWrap ? 'pre-wrap' : 'pre',
     wordBreak: (settings.wordWrap ? 'break-word' : 'normal') as React.CSSProperties['wordBreak'],
-    // Better mobile text rendering
     WebkitFontSmoothing: 'antialiased',
     MozOsxFontSmoothing: 'grayscale'
-  }), [settings.fontSize, settings.fontFamily, settings.lineHeight, settings.tabSize, settings.wordWrap]);
+  }), [settings.fontSize, settings.lineHeight, settings.tabSize, settings.wordWrap]);
 
   // Show loading skeleton
   if (isLoading && !highlightedCode) {
     return (
-      <div className={`${className}`}>
-        <div 
-          data-export-target="true" 
-          className="relative rounded-lg overflow-hidden shadow-lg"
+      <div className={className}>
+        <div
+          data-export-target="true"
+          className={`relative rounded-lg overflow-hidden shadow-lg ${dynamicFontClass}`}
           style={containerStyle}
           role="region"
           aria-label="Code preview loading"
@@ -381,9 +370,9 @@ export const CodePreview: React.FC<CodePreviewProps> = ({
   if (error && !highlightedCode) {
     return (
       <div className={className}>
-        <div 
-          data-export-target="true" 
-          className="relative rounded-lg overflow-hidden shadow-lg"
+        <div
+          data-export-target="true"
+          className={`relative rounded-lg overflow-hidden shadow-lg ${dynamicFontClass}`}
           style={containerStyle}
           role="region"
           aria-label="Code preview error"
@@ -393,6 +382,7 @@ export const CodePreview: React.FC<CodePreviewProps> = ({
             code={code}
             settings={settings}
             onRetry={handleRetry}
+            dynamicFontClass={dynamicFontClass}
           />
         </div>
       </div>
@@ -405,61 +395,45 @@ export const CodePreview: React.FC<CodePreviewProps> = ({
       <div className={className}>
         <div
           data-export-target="true"
-          className="rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center transition-colors hover:border-gray-400 dark:hover:border-gray-500"
-          style={containerStyle}
+          className={`rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center transition-colors hover:border-gray-400 dark:hover:border-gray-500 ${dynamicFontClass}`}
+          style={{
+            ...containerStyle,
+            height: '256px',
+            backgroundColor: 'transparent'
+          }}
           role="region"
-          aria-label="Empty code preview"
+          aria-label="Code preview empty state"
         >
-          <div className="text-center py-8 sm:py-12 px-4">
-            <svg
-              className="w-8 h-8 sm:w-12 sm:h-12 mx-auto mb-3 sm:mb-4 text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
+          <div className="text-center text-gray-500 dark:text-gray-400 px-4">
+            <svg className="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
             </svg>
-            <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base">
-              Enter some code to see the preview
-            </p>
-            <p className="text-gray-400 dark:text-gray-500 text-xs mt-1 hidden sm:block">
-              Paste your code in the editor to get started
-            </p>
+            <p className="text-sm font-medium">Start typing to see your code snippet here.</p>
           </div>
         </div>
       </div>
     );
   }
 
+  // Main render
   return (
     <div className={className}>
       <div
         ref={previewRef}
-        className={`
-          relative rounded-lg overflow-hidden shadow-lg transition-all duration-200
-          ${isExporting ? 'export-preview' : ''}
-          ${error ? 'border-2 border-yellow-300 dark:border-yellow-700' : ''}
-        `}
+        data-export-target="true"
+        className={`relative rounded-lg overflow-hidden shadow-lg ${dynamicFontClass}`}
         style={containerStyle}
         role="region"
         aria-label="Code preview"
-        aria-live="polite"
-        aria-busy={isLoading}
-        data-export-target="true"
       >
-        {/* Window header */}
         <WindowHeader
           title={settings.title}
           filename={settings.filename}
           windowStyle={settings.windowStyle}
           showControls={settings.showWindowControls}
-          backgroundColor={theme.background}
+          backgroundColor={settings.backgroundColor}
         />
-
-        {/* Code content */}
-        <div className="flex min-h-0">
-          {/* Line numbers */}
+        <div className="flex flex-1 overflow-auto">
           {settings.showLineNumbers && (
             <LineNumbers
               code={code}
@@ -468,81 +442,21 @@ export const CodePreview: React.FC<CodePreviewProps> = ({
               theme={theme}
             />
           )}
-
-          {/* Code content */}
-          <div className="flex-1 overflow-x-auto min-w-0">
+          <div
+            className="flex-1 overflow-x-auto p-4"
+            style={{
+              backgroundColor: theme.background,
+              color: theme.foreground
+            }}
+          >
             <div
-              className="p-2 sm:p-4 font-mono"
-              style={codeStyle}
+              className={`shiki-container ${dynamicFontClass}`} // 修复：直接在 shiki-container 上应用 dynamicFontClass
               dangerouslySetInnerHTML={{ __html: highlightedCode }}
-              role="code"
-              aria-label={`Code in ${language}`}
-              tabIndex={0}
+              style={codeStyle}
             />
           </div>
         </div>
-
-        {/* Loading overlay for updates */}
-        {isLoading && highlightedCode && (
-          <div className="absolute inset-0 bg-black bg-opacity-10 flex items-center justify-center">
-            <div className="bg-white dark:bg-gray-800 rounded-lg px-4 py-2 shadow-lg flex items-center space-x-2">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
-              <span className="text-sm text-gray-600 dark:text-gray-400">Updating...</span>
-            </div>
-          </div>
-        )}
-
-        {/* Error indicator */}
-        {error && (
-          <div className="absolute top-2 right-2">
-            <div className="bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 px-2 py-1 rounded text-xs flex items-center space-x-1">
-              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-              </svg>
-              <span>Fallback mode</span>
-            </div>
-          </div>
-        )}
-
-        {/* Export indicator */}
-        {isExporting && (
-          <div className="absolute inset-0 bg-blue-500 bg-opacity-10 flex items-center justify-center">
-            <div className="bg-blue-600 text-white rounded-lg px-4 py-2 shadow-lg flex items-center space-x-2">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-              <span className="text-sm">Generating image...</span>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Preview info */}
-      <div className="mt-2 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-        <div className="flex flex-wrap items-center gap-2 sm:gap-4">
-          <span className="flex items-center gap-1">
-            <span className="hidden sm:inline">Language:</span>
-            <span className="font-medium">{language}</span>
-          </span>
-          <span className="flex items-center gap-1">
-            <span className="hidden sm:inline">Theme:</span>
-            <span className="font-medium">{theme.name}</span>
-          </span>
-          <span className="flex items-center gap-1">
-            <span className="hidden sm:inline">Lines:</span>
-            <span className="font-medium">{code.split('\n').length}</span>
-          </span>
-        </div>
-        {error && (
-          <button
-            onClick={handleRetry}
-            className="text-blue-600 dark:text-blue-400 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded px-1 py-0.5 transition-colors"
-            aria-label={`Retry highlighting (attempt ${retryCount + 1})`}
-          >
-            Retry ({retryCount})
-          </button>
-        )}
       </div>
     </div>
   );
 };
-
-export default CodePreview;

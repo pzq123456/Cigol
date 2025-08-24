@@ -66,6 +66,8 @@ export const FONT_FAMILIES: FontFamily[] = [
   'Consolas',
   'Ubuntu Mono',
   'Roboto Mono',
+  'Victor Mono',
+  'Pacifico'
 ];
 
 /**

@@ -9,7 +9,7 @@ export interface HighlightService {
   /**
    * Highlight code with specified language and theme
    */
-  highlightCode(code: string, language: string, theme: Theme): Promise<string>;
+  highlightCode(code: string, language: string, theme: Theme, dynamicFontClass?: string): Promise<string>;
   
   /**
    * Get list of supported programming languages

@@ -117,7 +117,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
   const [currentLanguage, setCurrentLanguage] = useState(language);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const detectionTimeoutRef = useRef<NodeJS.Timeout>();
+  const detectionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const languageDetectionService = createLanguageDetectionService();
 
@@ -232,7 +232,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
             selectedLanguage={currentLanguage}
             onLanguageChange={handleLanguageChange}
             languages={supportedLanguages}
-            isDetected={!isLanguageManuallySelected && currentLanguage === detectedLanguage && detectionResult?.confidence > 0.6}
+            isDetected={!isLanguageManuallySelected && currentLanguage === detectedLanguage && (detectionResult?.confidence ?? 0) > 0.6}
             disabled={disabled || isLoading}
             className="w-full sm:w-48"
           />

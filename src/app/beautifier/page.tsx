@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import CodeEditor from '../components/CodeEditor';
-import CodePreview from '../components/CodePreview';
+import { CodePreview } from '../components/CodePreview';
 import ControlPanel from '../components/ContentPanel';
 import ExportModal from '../components/ExportModal';
 import ThemeToggle from '../components/ThemeToggle';
@@ -13,6 +13,30 @@ import { ExportOptions, ExportFormat, ExportResolution, ExportProgress } from '.
 import { exportService } from '../../services/export';
 import { createLanguageDetectionService } from '../../services/language-detection';
 import { createThemeManager } from '../../services/theme-manager';
+
+// 关键修复: 在父组件的顶层导入并加载所有字体
+import { Inter, Fira_Code, Roboto_Mono, JetBrains_Mono, Source_Code_Pro, Victor_Mono, Pacifico } from 'next/font/google';
+
+// 创建字体对象
+const interFont = Inter({ subsets: ['latin'], display: 'swap' });
+const firaCodeFont = Fira_Code({ subsets: ['latin'], display: 'swap' });
+const robotoMonoFont = Roboto_Mono({ subsets: ['latin'], display: 'swap' });
+const jetBrainsMonoFont = JetBrains_Mono({ subsets: ['latin'], display: 'swap' });
+const sourceCodeProFont = Source_Code_Pro({ subsets: ['latin'], display: 'swap' });
+const victorMonoFont = Victor_Mono({ subsets: ['latin'], display: 'swap' });
+const pacificoFont = Pacifico({ subsets: ['latin'], display: 'swap', weight: '400' }); // 示例：如果需要更多字体，可以继续添加
+
+// 创建字体类名映射，这是核心改变
+const fontMap = {
+  'Inter': interFont.className,
+  'Fira Code': firaCodeFont.className,
+  'Roboto Mono': robotoMonoFont.className,
+  'JetBrains Mono': jetBrainsMonoFont.className,
+  'Source Code Pro': sourceCodeProFont.className,
+  'Victor Mono': victorMonoFont.className,
+  'Pacifico': pacificoFont.className, // 示例：如果需要更多字体，可以继续添加
+};
+
 
 /**
  * Code Snippet Beautifier main page
@@ -29,7 +53,7 @@ export default function BeautifierPage() {
   const [settings, setSettings] = useState<PreviewSettings>({
     theme: null as any, // Will be set when themes load
     fontSize: 14,
-    fontFamily: 'Fira Code, Monaco, Consolas, monospace',
+    fontFamily: 'Fira Code', // 确保这里是单个字体名称
     lineNumbers: true,
     title: '',
     filename: 'example.js',
@@ -254,6 +278,16 @@ export default function BeautifierPage() {
     setSidebarOpen(prev => !prev);
   }, []);
 
+  // 关键修复: 确保字体映射正确，并添加类型安全
+  const dynamicFontClass = useMemo(() => {
+    const font = settings.fontFamily as keyof typeof fontMap;
+    // 使用类型守卫确保键存在
+    if (font in fontMap) {
+      return fontMap[font];
+    }
+    return ''; // 如果找不到，返回空字符串
+  }, [settings.fontFamily]);
+  
   if (!currentTheme) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
@@ -365,6 +399,7 @@ export default function BeautifierPage() {
                   settings={settings}
                   className="max-w-full max-h-full"
                   onPreviewReady={handlePreviewReady}
+                  dynamicFontClass={dynamicFontClass} // ⬅️ 将动态类名作为prop传递
                 />
               </div>
             </div>
