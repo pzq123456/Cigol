@@ -1,52 +1,72 @@
 @import "tailwindcss";
 
 :root {
---primary-blue: #1E3A8A;
---accent-orange: #F97316;
---accent-orange-light: #FB923C;
---accent-orange-dark: #EA580C;
---background-start: #FFFFFF;
---background-mid: #F3F4F6;
---background-end: #E5E7EB;
---foreground: #222222;
---foreground-secondary: #444444;
---neutral-light: #F3F4F6;
---neutral-dark: #1F2937;
---neutral-gray: #6B7280;
---neutral-border: #D1D5DB;
---font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
---font-mono: "Geist Mono", "Fira Code", monospace;
+  --primary-blue: #1E3A8A;
+  --accent-orange: #F97316;
+  --accent-orange-light: #FB923C;
+  --accent-orange-dark: #EA580C;
+  --background-start: #FFFFFF;
+  --background-mid: #F3F4F6;
+  --background-end: #E5E7EB;
+  --foreground: #222222;
+  --foreground-secondary: #444444;
+  --neutral-light: #F3F4F6;
+  --neutral-dark: #1F2937;
+  --neutral-gray: #6B7280;
+  --neutral-border: #D1D5DB;
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  --font-mono: "Geist Mono", "Fira Code", monospace;
 }
 
 .dark {
---background-start: #0A0A0A;
---background-mid: #1E1E2E;
---background-end: #1E3A8A;
---foreground: #EDEDED;
---foreground-secondary: #CCCCCC;
---neutral-light: #1F2937;
---neutral-dark: #111827;
---neutral-gray: #9CA3AF;
---neutral-border: #374151;
+  --background-start: #0A0A0A;
+  --background-mid: #1E1E2E;
+  --background-end: #1E3A8A;
+  --foreground: #EDEDED;
+  --foreground-secondary: #CCCCCC;
+  --neutral-light: #1F2937;
+  --neutral-dark: #111827;
+  --neutral-gray: #9CA3AF;
+  --neutral-border: #374151;
+}
+
+/* 关键修复：添加深色模式变体 */
+@variant dark {
+  &:where(.dark, .dark *) {
+    @slot;
+  }
 }
 
 @theme inline {
---color-background: var(--background-start);
---color-foreground: var(--foreground);
---color-primary: var(--primary-blue);
---color-accent: var(--accent-orange);
---font-sans: var(--font-sans);
---font-mono: var(--font-mono);
+  --color-background: var(--background-start);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary-blue);
+  --color-accent: var(--accent-orange);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
 }
 
-/* 修复：添加了body选择器 */
+/* 其余样式保持不变... */
 body {
-background: var(--background-start);
-color: var(--foreground);
-font-family: var(--font-sans);
--webkit-font-smoothing: antialiased;
--moz-osx-font-smoothing: grayscale;
-transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+  background: var(--background-start);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* 确保主题切换正确应用到所有页面 */
+html {
+  transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+html:not(.dark) {
+  color-scheme: light;
 }
 
 h1,

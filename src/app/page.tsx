@@ -73,6 +73,32 @@ export default function Home() {
             <span className="text-[#F97316]">&gt;</span> cigol.dev is under construction! We&apos;re building a hub for developers, designers, and researchers with powerful tools, a personal portfolio, and a geek blog. Stay tuned!
           </p>
 
+          {/* Available Tools */}
+          <div className="bg-background/30 backdrop-blur-sm p-6 rounded-2xl border border-gray-800 shadow-lg">
+            <h3 className="text-xl font-semibold text-white mb-4">Available Tools</h3>
+            <div className="space-y-3">
+              <a
+                href="/beautifier"
+                className="flex items-center justify-between p-4 rounded-lg bg-gray-800/50 hover:bg-gray-700/50 transition-colors duration-300 group"
+              >
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h4 className="text-white font-medium">Code Snippet Beautifier</h4>
+                    <p className="text-gray-400 text-sm">Transform your code into beautiful, shareable images</p>
+                  </div>
+                </div>
+                <svg className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </a>
+            </div>
+          </div>
+
           {/* Subscription Form */}
           <div className="space-y-4 w-full max-w-md mx-auto">
             <div className="bg-background/30 backdrop-blur-sm p-6 rounded-2xl border border-gray-800 shadow-lg">
