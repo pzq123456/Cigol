@@ -43,10 +43,10 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
   }, [themeManager, settings.theme]);
 
   const sections = [
-    { id: 'appearance', label: 'Appearance', icon: '🎨' },
-    { id: 'layout', label: 'Layout', icon: '📐' },
-    { id: 'content', label: 'Content', icon: '📝' },
-    { id: 'export', label: 'Export', icon: '📤' }
+    { id: 'appearance', label: 'Appearance'},
+    { id: 'layout', label: 'Layout'},
+    { id: 'content', label: 'Content'},
+    { id: 'export', label: 'Export'}
   ];
 
   const renderActivePanel = () => {
@@ -122,8 +122,8 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                 disabled:opacity-50 disabled:cursor-not-allowed
               `}
             >
-              <span>{section.icon}</span>
-              <span className="hidden sm:inline">{section.label}</span>
+                <span className="sm:hidden">{section.label.slice(0, 3)}</span>
+                <span className="hidden sm:inline">{section.label}</span>
             </button>
           ))}
         </nav>

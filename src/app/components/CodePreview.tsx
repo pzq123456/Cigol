@@ -14,6 +14,38 @@ const WindowControls: React.FC<{ style: WindowStyle; className?: string }> = Rea
 }) => {
   if (style === 'none') return null;
 
+  // Windows 按钮顺序调整：最小化、最大化/还原、关闭
+  const windowsButtons = (
+    <>
+      <div
+        className="w-4 h-4 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+        title="Minimize"
+        role="button"
+        tabIndex={-1}
+      >
+        <div className="w-2 h-0.5 bg-gray-600 dark:bg-gray-400"></div>
+      </div>
+      <div
+        className="w-4 h-4 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+        title="Maximize/Restore"
+        role="button"
+        tabIndex={-1}
+      >
+        <div className="w-2 h-2 border border-gray-600 dark:border-gray-400"></div>
+      </div>
+      <div
+        className="w-4 h-4 flex items-center justify-center hover:bg-red-500 hover:text-white transition-colors cursor-pointer"
+        title="Close"
+        role="button"
+        tabIndex={-1}
+      >
+        <svg className="w-2.5 h-2.5 text-gray-600 dark:text-gray-400 group-hover:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </div>
+    </>
+  );
+
   return (
     <div className={`flex items-center space-x-2 ${className}`} role="presentation" aria-label="Window controls">
       {style === 'macos' && (
@@ -38,37 +70,7 @@ const WindowControls: React.FC<{ style: WindowStyle; className?: string }> = Rea
           ></div>
         </>
       )}
-      {style === 'windows' && (
-        <>
-          <div
-            className="w-4 h-4 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors cursor-pointer"
-            title="Minimize"
-            role="button"
-            tabIndex={-1}
-          >
-            <div className="w-2 h-0.5 bg-gray-600 dark:bg-gray-400"></div>
-          </div>
-          <div
-            className="w-4 h-4 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors cursor-pointer"
-            title="Maximize"
-            role="button"
-            tabIndex={-1}
-          >
-            <div className="w-2 h-2 border border-gray-600 dark:border-gray-400"></div>
-          </div>
-          <div
-            className="w-4 h-4 flex items-center justify-center hover:bg-red-500 hover:text-white transition-colors cursor-pointer"
-            title="Close"
-            role="button"
-            tabIndex={-1}
-          >
-            <div className="w-2 h-2 relative">
-              <div className="absolute inset-0 border border-gray-600 dark:border-gray-400"></div>
-              <div className="absolute top-0.5 left-0.5 w-1.5 h-1.5 border border-gray-600 dark:border-gray-400"></div>
-            </div>
-          </div>
-        </>
-      )}
+      {style === 'windows' && windowsButtons}
     </div>
   );
 });
@@ -76,7 +78,7 @@ const WindowControls: React.FC<{ style: WindowStyle; className?: string }> = Rea
 WindowControls.displayName = 'WindowControls';
 
 /**
- * Window header component with title and controls
+ * Window header component with title, filename and controls
  */
 const WindowHeader: React.FC<{
   title?: string;
@@ -84,44 +86,63 @@ const WindowHeader: React.FC<{
   windowStyle: WindowStyle;
   showControls: boolean;
   backgroundColor: string;
-}> = React.memo(({ title, filename, windowStyle, showControls, backgroundColor }) => {
+  isTabbed?: boolean;
+}> = React.memo(({ title, filename, windowStyle, showControls, backgroundColor, isTabbed = false }) => {
   if (!showControls && !title && !filename) return null;
 
   return (
     <header
-      className="flex items-center justify-between px-4 py-3 border-b border-opacity-20 border-gray-500 select-none"
+      className="flex items-center px-4 py-3 border-b border-opacity-20 border-gray-500 select-none"
       style={{ backgroundColor }}
       role="banner"
       aria-label="Code preview header"
     >
       <div className="flex items-center space-x-3 min-w-0 flex-1">
-        {showControls && <WindowControls style={windowStyle} />}
-        <div className="flex flex-col min-w-0 flex-1">
-          {title && (
+        {/* macOS 控制按钮保持在左侧 */}
+        {showControls && windowStyle === 'macos' && (
+          <WindowControls style={windowStyle} />
+        )}
+        <div className="flex-shrink-0">
+          {isTabbed && filename ? (
             <div
-              className="text-sm font-medium text-gray-700 dark:text-gray-300 truncate"
-              title={title}
-              aria-label={`Code title: ${title}`}
+              className="px-2 py-1 max-w-[150px] bg-gray-700 dark:bg-gray-200 rounded-md border-b-0 border-gray-500 border-opacity-20 text-sm flex items-center"
             >
-              {title}
+              <div
+                className="text-gray-200 dark:text-gray-700 truncate font-mono"
+                title={filename}
+                aria-label={`Filename tab: ${filename}`}
+              >
+                {filename}
+              </div>
             </div>
-          )}
-          {filename && (
-            <div
-              className="text-xs text-gray-500 dark:text-gray-400 truncate"
-              title={filename}
-              aria-label={`Filename: ${filename}`}
-            >
-              {filename}
-            </div>
+          ) : (
+            <>
+              {title && (
+                <div
+                  className="text-sm font-medium text-gray-700 dark:text-gray-300 truncate"
+                  title={title}
+                  aria-label={`Code title: ${title}`}
+                >
+                  {title}
+                </div>
+              )}
+              {filename && (
+                <div
+                  className="text-xs text-gray-500 dark:text-gray-400 truncate"
+                  title={filename}
+                  aria-label={`Filename: ${filename}`}
+                >
+                  {filename}
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
-
-      {/* Mobile-friendly spacing */}
-      <div className="flex-shrink-0 ml-2 sm:ml-4">
-        {/* Reserved space for future actions */}
-      </div>
+      {/* Windows 控制按钮移到右侧 */}
+      {showControls && windowStyle === 'windows' && (
+        <WindowControls style={windowStyle} className="ml-2" />
+      )}
     </header>
   );
 });
@@ -183,13 +204,22 @@ const LoadingSkeleton: React.FC<{ settings: any }> = ({ settings }) => (
     {settings.showWindowControls && (
       <div className="flex items-center justify-between px-4 py-3 border-b border-opacity-20 border-gray-500 mb-4">
         <div className="flex items-center space-x-3">
-          <div className="flex space-x-2">
-            <div className="w-3 h-3 rounded-full bg-gray-400"></div>
-            <div className="w-3 h-3 rounded-full bg-gray-400"></div>
-            <div className="w-3 h-3 rounded-full bg-gray-400"></div>
-          </div>
+          {settings.windowStyle === 'macos' && (
+            <div className="flex space-x-2">
+              <div className="w-3 h-3 rounded-full bg-gray-400"></div>
+              <div className="w-3 h-3 rounded-full bg-gray-400"></div>
+              <div className="w-3 h-3 rounded-full bg-gray-400"></div>
+            </div>
+          )}
           <div className="h-4 bg-gray-400 rounded w-24"></div>
         </div>
+        {settings.windowStyle === 'windows' && (
+          <div className="flex space-x-2">
+            <div className="w-4 h-4 bg-gray-400"></div>
+            <div className="w-4 h-4 bg-gray-400"></div>
+            <div className="w-4 h-4 bg-gray-400"></div>
+          </div>
+        )}
       </div>
     )}
     <div className="space-y-2">
@@ -248,8 +278,6 @@ const ErrorFallback: React.FC<{
         </div>
       </div>
     </div>
-
-    {/* Plain text fallback */}
     <div className="mt-4 border-t border-gray-300 dark:border-gray-600 pt-4">
       <pre
         className={`font-mono text-sm whitespace-pre-wrap break-words ${dynamicFontClass}`}
@@ -303,7 +331,6 @@ export const CodePreview: React.FC<CodePreviewWithFontProps> = ({
     setError(null);
 
     try {
-      // 确保 highlightService 将 dynamicFontClass 应用到生成的 HTML
       const highlighted = await highlightService.highlightCode(code, language, theme, dynamicFontClass);
       setHighlightedCode(highlighted);
 
@@ -432,6 +459,7 @@ export const CodePreview: React.FC<CodePreviewWithFontProps> = ({
           windowStyle={settings.windowStyle}
           showControls={settings.showWindowControls}
           backgroundColor={settings.backgroundColor}
+          isTabbed={true}
         />
         <div className="flex flex-1 overflow-auto">
           {settings.showLineNumbers && (
@@ -450,7 +478,7 @@ export const CodePreview: React.FC<CodePreviewWithFontProps> = ({
             }}
           >
             <div
-              className={`shiki-container ${dynamicFontClass}`} // 修复：直接在 shiki-container 上应用 dynamicFontClass
+              className={`shiki-container ${dynamicFontClass}`}
               dangerouslySetInnerHTML={{ __html: highlightedCode }}
               style={codeStyle}
             />

@@ -51,6 +51,7 @@ export interface ExportModalProps {
   isExporting: boolean;
   exportProgress?: number;
   className?: string;
+  initialOptions?: Partial<ExportOptions>;
 }
 
 /**

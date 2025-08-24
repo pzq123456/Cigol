@@ -13,11 +13,13 @@ export default function ExportModal({
   onExport,
   isExporting,
   exportProgress = 0,
-  className = ''
+  className = '',
+  // 增加一个新的 prop 来接收初始选项
+  initialOptions = {} as Partial<ExportOptions>
 }: ExportModalProps) {
-  // Form state
-  const [format, setFormat] = useState<ExportFormat>('png');
-  const [resolution, setResolution] = useState<ExportResolution>(2);
+  // 模态框内部状态
+  const [format, setFormat] = useState<ExportFormat>(initialOptions.format || 'png');
+  const [resolution, setResolution] = useState<ExportResolution>(initialOptions.resolution || 2);
   const [quality, setQuality] = useState(90);
   const [transparent, setTransparent] = useState(true);
   const [filename, setFilename] = useState('code-snippet');
@@ -26,18 +28,18 @@ export default function ExportModal({
   const [progress, setProgress] = useState<ExportProgress | null>(null);
   const [showAdvanced, setShowAdvanced] = useState(false);
 
-  // Reset form when modal opens
+  // 关键修复: 当 modal 打开或 initialOptions 变化时，重置状态
   useEffect(() => {
     if (isOpen) {
-      setFormat('png');
-      setResolution(2);
-      setQuality(90);
-      setTransparent(true);
-      setFilename('code-snippet');
+      setFormat(initialOptions.format || 'png');
+      setResolution(initialOptions.resolution || 2);
+      setQuality(initialOptions.quality || 90); // 增加质量的初始值设置
+      setTransparent(initialOptions.transparent !== undefined ? initialOptions.transparent : (initialOptions.format === 'png' ? true : false));
+      setFilename(initialOptions.filename || 'code-snippet');
       setProgress(null);
       setShowAdvanced(false);
     }
-  }, [isOpen]);
+  }, [isOpen, initialOptions]); // 添加 initialOptions 作为依赖项
 
   // Handle export
   const handleExport = () => {
@@ -99,7 +101,7 @@ export default function ExportModal({
 
   return (
     <div 
-      className={`fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm ${className}`}
+      className={`fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm ${className}`}
       onClick={handleBackdropClick}
     >
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">

@@ -4,7 +4,7 @@ import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import CodeEditor from '../components/CodeEditor';
 import { CodePreview } from '../components/CodePreview';
-import ControlPanel from '../components/ContentPanel';
+import ControlPanel from '../components/ContentPanel'; // 确保这里是正确的路径
 import ExportModal from '../components/ExportModal';
 import ThemeToggle from '../components/ThemeToggle';
 import { PreviewSettings } from '../../types/preview';
@@ -73,6 +73,8 @@ export default function BeautifierPage() {
   const [isExporting, setIsExporting] = useState(false);
   const [exportProgress, setExportProgress] = useState(0);
   const [exportError, setExportError] = useState<string | null>(null);
+  // 新增状态来存储初始导出选项
+  const [exportInitialOptions, setExportInitialOptions] = useState<Partial<ExportOptions>>({});
 
   // UI state
   const [isMobile, setIsMobile] = useState(false);
@@ -184,8 +186,19 @@ export default function BeautifierPage() {
     }
   }, [currentTheme]);
 
-  // Handle export
-  const handleExport = useCallback(async (format: ExportFormat, resolution: ExportResolution) => {
+  // 新增：处理打开导出模态框并设置初始选项
+  const handleOpenExportModal = useCallback((format: ExportFormat, resolution: ExportResolution) => {
+    const options: Partial<ExportOptions> = {
+      format,
+      resolution,
+    };
+    if (format === 'jpeg') {
+        options.transparent = false;
+        options.quality = 90;
+    } else {
+        options.transparent = true;
+    }
+    setExportInitialOptions(options);
     setIsExportModalOpen(true);
   }, []);
 
@@ -332,7 +345,7 @@ export default function BeautifierPage() {
 
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
         <aside className={`
-          ${isMobile ? 'fixed inset-y-0 left-0 z-50 w-120' : 'relative w-120'}
+          ${isMobile ? 'fixed inset-y-0 left-0 z-50 w-90' : 'relative w-90'}
           ${isMobile && !sidebarOpen ? '-translate-x-full' : 'translate-x-0'}
           bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 
           transition-transform duration-300 ease-in-out
@@ -357,7 +370,7 @@ export default function BeautifierPage() {
             <ControlPanel
               settings={settings}
               onSettingsChange={handleSettingsChange}
-              onExport={handleExport}
+              onExport={handleOpenExportModal} 
               className="h-full"
             />
           </div>
@@ -413,26 +426,19 @@ export default function BeautifierPage() {
         onExport={handleExportWithOptions}
         isExporting={isExporting}
         exportProgress={exportProgress}
+        initialOptions={exportInitialOptions} 
       />
 
       {exportError && (
-        <div className="fixed bottom-4 right-4 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 max-w-md">
-          <div className="flex items-start space-x-2">
-            <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        <div 
+          className="fixed bottom-4 left-1/2 -translate-x-1/2 px-4 py-3 rounded-lg text-white bg-red-500 shadow-lg z-50 transition-opacity duration-300"
+          role="alert"
+        >
+          <div className="flex items-center space-x-2">
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
             </svg>
-            <div className="flex-1">
-              <div className="text-sm font-medium">导出失败</div>
-              <div className="text-xs mt-1 opacity-90">{exportError}</div>
-            </div>
-            <button
-              onClick={() => setExportError(null)}
-              className="ml-2 text-white hover:text-gray-200 flex-shrink-0"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+            <span>{exportError}</span>
           </div>
         </div>
       )}

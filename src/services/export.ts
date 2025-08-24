@@ -34,7 +34,7 @@ export class ExportServiceImpl implements ExportService {
       console.warn('Export already in progress.');
       throw new Error('Export already in progress');
     }
-    
+
     console.log('[DEBUG] 🏁 Starting exportToImage process...');
     this.status = 'processing';
     this.abortController = new AbortController();
@@ -93,7 +93,7 @@ export class ExportServiceImpl implements ExportService {
     console.log(`\n[DEBUG] 🚀 Starting attemptExport for attempt #${retryCount + 1}`);
     console.log('[DEBUG] 📥 Export Options:', options);
     console.log('[DEBUG] 📦 Element to export:', element);
-    
+
     // Check for 'lab(' in the element's inner HTML
     const innerHtml = element.innerHTML;
     const hasLab = innerHtml.includes('lab(');
@@ -105,19 +105,20 @@ export class ExportServiceImpl implements ExportService {
 
     this.validateExportOptions(options);
 
-    // Calculate dimensions based on resolution
+    // 获取元素的实际渲染尺寸，这将作为最终图片的逻辑尺寸。
     const rect = element.getBoundingClientRect();
-    const baseWidth = options.width || rect.width;
-    const baseHeight = options.height || rect.height;
-    
-    console.log(`[DEBUG] 📏 Element dimensions: ${rect.width}x${rect.height}`);
-    console.log(`[DEBUG] 📈 Calculated scaled dimensions: ${baseWidth}x${baseHeight} at resolution ${options.resolution}`);
+    const baseWidth = rect.width;
+    const baseHeight = rect.height;
+
+    console.log(`[DEBUG] 📏 Element dimensions: ${baseWidth}x${baseHeight}`);
 
     if (baseWidth <= 0 || baseHeight <= 0) {
       const errMsg = 'Invalid element dimensions';
       console.error(`[DEBUG] ❌ Error: ${errMsg}`);
       throw new Error(errMsg);
     }
+    
+    // 计算最终画布的物理像素尺寸
     const scaledWidth = baseWidth * options.resolution;
     const scaledHeight = baseHeight * options.resolution;
 
@@ -142,9 +143,12 @@ export class ExportServiceImpl implements ExportService {
 
     // html2canvas configuration
     const canvasOptions = {
-      width: scaledWidth,
-      height: scaledHeight,
+      // 修复：传入元素的实际逻辑尺寸，而不是物理像素
+      width: baseWidth,
+      height: baseHeight,
+      // 修复：使用传入的分辨率作为缩放比例
       scale: options.resolution,
+      // 修复：根据透明选项设置背景色
       backgroundColor: options.transparent && options.format === 'png' ? null : '#ffffff',
       logging: false,
       useCORS: true,
@@ -155,7 +159,7 @@ export class ExportServiceImpl implements ExportService {
       // 开启 <img/> 的 object-fit 支持
       enableObjectFit: true
     };
-    
+
     console.log('[DEBUG] ⚙️ html2canvas options:', canvasOptions);
 
     const canvas = await html2canvas(element, canvasOptions);
@@ -174,7 +178,7 @@ export class ExportServiceImpl implements ExportService {
       progress: 75,
       message: 'Generating image file...'
     });
-    
+
     console.log('[DEBUG] 💾 Converting canvas to blob...');
 
     if (this.abortController?.signal.aborted) {
@@ -183,7 +187,7 @@ export class ExportServiceImpl implements ExportService {
     }
 
     const blob = await this.canvasToBlob(canvas, options);
-    
+
     console.log('[DEBUG] ✅ Blob generated:', blob);
     if (!blob || blob.size === 0) {
       const errMsg = 'Failed to generate image blob. Blob is empty or invalid.';
