@@ -1,167 +1,89 @@
-import ClientClock from './components/ClientClock';
-import ThemeToggle from './components/ThemeToggle';
+import ClientClock from "./components/ClientClock";
+import ThemeToggle from "./components/ThemeToggle";
+import SubscriptionForm from "./components/SubscriptionForm";
+import ToolCard from "./components/ToolCard";
+import Logo from "./components/Logo";
+import Footer from "./components/Footer";
+import TimestampConverter from "./components/QuickUtils";
 
 export default function Home() {
+  const tools = [
+    {
+      href: "/beautifier",
+      title: "Code Snippet Beautifier",
+      description: "Transform your code into beautiful, shareable images",
+    },
+    {
+      href: "https://geo.cigol.dev",
+      title: "Maption",
+      description: "The online SaaS platform for Geospatial Storytelling",
+    },
+  ];
+
   return (
-    <div
-      className="font-sans min-h-screen flex flex-col items-center justify-center p-4 relative"
-      style={{
-        background: `linear-gradient(135deg, var(--background-start), var(--background-mid), var(--background-end))`,
-        color: 'var(--foreground)',
-      }}
-    >
-      <ThemeToggle />
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0a] text-slate-900 dark:text-gray-100 flex flex-col items-center transition-colors duration-500 selection:bg-[#F97316]/30">
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        {/* 优化后的左上角：增加了暗色模式下的透明度 */}
+        <div
+          className="absolute -top-[10%] -left-[10%] w-[50%] h-[50%] 
+        bg-[#F97316]/20 dark:bg-[#F97316]/15 
+        blur-[100px] rounded-full mix-blend-screen"
+        />
 
-      <main className="flex flex-col items-center justify-center text-center max-w-2xl w-full gap-8 py-12">
-        {/* Logo Section */}
-        <div className="flex flex-col items-center gap-4">
-          <div className="relative">
-            <div className="absolute inset-0 bg-[#F97316] rounded-full blur-lg opacity-20 animate-pulse"></div>
-            <svg
-              width="80"
-              height="80"
-              viewBox="0 0 100 100"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="relative z-10"
-            >
-              <circle
-                cx="50"
-                cy="50"
-                r="45"
-                stroke="url(#orangeGradient)"
-                strokeWidth="3"
-                fill="none"
-                opacity="0.8"
-              />
-              <text
-                x="50"
-                y="68"
-                fontFamily="monospace"
-                fontSize="60"
-                fontWeight="bold"
-                fill="url(#orangeGradient)"
-                textAnchor="middle"
-              >
-                C
-              </text>
-              <defs>
-                <linearGradient id="orangeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#F97316" />
-                  <stop offset="100%" stopColor="#FB923C" />
-                </linearGradient>
-              </defs>
-            </svg>
-          </div>
-          <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#F97316] to-[#FB923C] tracking-tight">
-            cigol.dev
-          </h1>
-        </div>
+        {/* 优化后的右下角：增加了暗色模式下的透明度 */}
+        <div
+          className="absolute -bottom-[10%] -right-[10%] w-[50%] h-[50%] 
+        bg-blue-600/20 dark:bg-blue-500/15 
+        blur-[100px] rounded-full mix-blend-screen"
+        />
+      </div>
 
-        {/* Current Time Display */}
-        <div className="my-6 w-full">
+      <div className="w-full max-w-7xl px-6 py-6 relative z-30 flex justify-end">
+        <ThemeToggle />
+      </div>
+
+      <main className="flex-1 flex flex-col items-center justify-center px-4 w-full max-w-2xl relative z-10 text-center">
+        <Logo />
+
+        <div className="w-full mb-12">
           <ClientClock />
         </div>
 
-        {/* Main Content */}
-        <div className="space-y-8">
-          <h2 className="text-3xl font-bold text-white">
-            Coming Soon
-          </h2>
+        <section className="w-full space-y-3">
+          <h3 className="text-left text-xs font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-gray-500 ml-1">
+            Quick Tools: Epoch Converter
+          </h3>
+          <TimestampConverter />
+        </section>
 
-          <p className="font-mono text-lg text-gray-300 leading-relaxed">
-            <span className="text-[#F97316]">&gt;</span> cigol.dev is under construction! We&apos;re building a hub for developers, designers, and researchers with powerful tools, a personal portfolio, and a geek blog. Stay tuned!
-          </p>
-
-          {/* Available Tools */}
-          <div className="bg-background/30 backdrop-blur-sm p-6 rounded-2xl border border-gray-800 shadow-lg">
-            <h3 className="text-xl font-semibold text-white mb-4">Available Tools</h3>
-            <div className="space-y-3">
-              <a
-                href="/beautifier"
-                className="flex items-center justify-between p-4 rounded-lg bg-gray-800/50 hover:bg-gray-700/50 transition-colors duration-300 group"
-              >
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h4 className="text-white font-medium">Code Snippet Beautifier</h4>
-                    <p className="text-gray-400 text-sm">Transform your code into beautiful, shareable images</p>
-                  </div>
-                </div>
-                <svg className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </a>
+        <div className="space-y-12 w-full">
+          <section>
+            <div className="text-left text-xs font-bold uppercase text-slate-400 dark:text-gray-500 mt-2 ml-1 border border-dashed border-slate-300 dark:border-gray-600 p-4 rounded-lg mb-4">
+              Other tools
             </div>
-          </div>
+            <h2 className="text-2xl font-bold text-slate-800 dark:text-white mb-4 tracking-tight">
+              Coming Soon
+            </h2>
+            <p className="font-mono text-slate-600 dark:text-gray-400 text-lg leading-relaxed max-w-lg mx-auto">
+              <span className="text-[#F97316] animate-pulse">&gt;</span>{" "}
+              cigol.dev is under construction!
+            </p>
+          </section>
 
-          {/* Subscription Form */}
-          <div className="space-y-4 w-full max-w-md mx-auto">
-            <div className="bg-background/30 backdrop-blur-sm p-6 rounded-2xl border border-gray-800 shadow-lg">
-              <h3 className="text-xl font-semibold text-white mb-4">Get notified when we launch</h3>
-              <form className="flex flex-col sm:flex-row gap-3">
-                <input
-                  type="email"
-                  placeholder="Enter your email"
-                  className="flex-1 px-4 py-3 rounded-full border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#F97316] focus:border-transparent"
-                  required
-                />
-                <button
-                  type="submit"
-                  className="px-6 py-3 rounded-full bg-gradient-to-r from-[#F97316] to-[#FB923C] text-white font-semibold hover:from-[#EA580C] hover:to-[#F97316] transition-all duration-300 shadow-lg hover:shadow-orange-500/20"
-                >
-                  Subscribe
-                </button>
-              </form>
-              <p className="text-xs text-gray-500 mt-3">We respect your privacy. Unsubscribe at any time.</p>
-            </div>
-          </div>
+          <section className="grid gap-3">
+            <h3 className="text-left text-xs font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-gray-500 ml-1">
+              Available Tools
+            </h3>
+            {tools.map((tool) => (
+              <ToolCard key={tool.href} {...tool} />
+            ))}
+          </section>
 
-          {/* Social Links */}
-          <div className="flex justify-center gap-6 pt-4">
-            <a
-              href="https://x.com/cigol_dev"
-              target="_blank"
-              rel="noopener noreferrer nofollow"
-              className="group p-3 rounded-full bg-gray-800 hover:bg-[#F97316] transition-colors duration-300"
-              aria-label="Follow us on X (formerly Twitter)"
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className="group-hover:scale-110 transition-transform duration-300"
-              >
-                <path
-                  d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"
-                  fill="currentColor"
-                  className="text-gray-400 group-hover:text-white"
-                />
-              </svg>
-            </a>
-          </div>
+          <SubscriptionForm />
         </div>
       </main>
 
-      <footer className="mt-16 text-center text-sm text-gray-500">
-        <div className="flex flex-wrap items-center justify-center gap-4 mb-2">
-          <p>&copy; 2025 cigol.dev. All rights reserved.</p>
-          <span className="text-gray-700">•</span>
-          <a href="/privacy" className="hover:text-[#F97316] transition-colors duration-300">
-            Privacy
-          </a>
-          <span className="text-gray-700">•</span>
-          <a href="/terms" className="hover:text-[#F97316] transition-colors duration-300">
-            Terms
-          </a>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

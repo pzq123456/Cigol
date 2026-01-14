@@ -46,7 +46,6 @@
   --font-mono: var(--font-mono);
 }
 
-/* 其余样式保持不变... */
 body {
   background: var(--background-start);
   color: var(--foreground);
