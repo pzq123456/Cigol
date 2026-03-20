@@ -1,4 +1,5 @@
 import ClientClock from "./components/ClientClock";
+import Cube from "./components/Cube";
 import ThemeToggle from "./components/ThemeToggle";
 import SubscriptionForm from "./components/SubscriptionForm";
 import ToolCard from "./components/ToolCard";
@@ -77,6 +78,15 @@ export default function Home() {
             {tools.map((tool) => (
               <ToolCard key={tool.href} {...tool} />
             ))}
+          </section>
+
+          <section className="grid gap-3">
+            <h3 className="text-left text-xs font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-gray-500 ml-1">
+              Toys Cube
+            </h3>
+            <div className="w-full mb-12">
+              <Cube />
+            </div>
           </section>
 
           <SubscriptionForm />
