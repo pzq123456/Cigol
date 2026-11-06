@@ -29,11 +29,9 @@ jobs:
         run: npm run build
 
       - name: Deploy to Cloudflare Pages
-        uses: cloudflare/pages-action@v1
+        uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: cigol
-          directory: out
+          command: pages deploy out --project-name=cigol --branch=main
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
-          branch: main # 明确指定生产分支
