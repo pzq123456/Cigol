@@ -22,18 +22,10 @@ export default function Footer() {
 
           {/* 右侧：链接组 */}
           <div className="flex items-center gap-6 order-1 md:order-2">
-            <nav className="flex gap-6 text-slate-500 dark:text-gray-500">
-              <a href="/privacy" className="hover:text-[#F97316] dark:hover:text-white transition-colors">Privacy</a>
-              <a href="/terms" className="hover:text-[#F97316] dark:hover:text-white transition-colors">Terms</a>
-            </nav>
-            
-            {/* 极简分割线 */}
-            <div className="h-4 w-[1px] bg-slate-200 dark:bg-white/10 hidden sm:block"></div>
-
             {/* 社交图标链接 */}
             <div className="flex items-center gap-4">
               <a 
-                href="https://github.com/your-username" 
+                href="https://github.com/pzq123456" 
                 target="_blank" 
                 className="text-slate-400 dark:text-gray-600 hover:text-slate-900 dark:hover:text-white transition-colors"
                 aria-label="GitHub"

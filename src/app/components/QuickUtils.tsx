@@ -3,17 +3,21 @@
 import { useState, useEffect } from 'react';
 
 export default function TimestampConverter() {
-  const [now, setNow] = useState(Math.floor(Date.now() / 1000));
+  // 固定初始值，避免 SSR 与客户端首次渲染的秒数不一致导致 hydration 报错；
+  // 真实时间在挂载后的 useEffect 里写入。
+  const [now, setNow] = useState(0);
   const [input, setInput] = useState('');
   const [copyLabel, setCopyLabel] = useState('Copy');
 
   // 实时更新当前时间戳
   useEffect(() => {
+    setNow(Math.floor(Date.now() / 1000));
     const timer = setInterval(() => setNow(Math.floor(Date.now() / 1000)), 1000);
     return () => clearInterval(timer);
   }, []);
 
   const handleCopy = (val: string) => {
+    if (!val || val === '0') return;
     navigator.clipboard.writeText(val);
     setCopyLabel('Saved!');
     setTimeout(() => setCopyLabel('Copy'), 2000);
@@ -26,7 +30,7 @@ export default function TimestampConverter() {
     
     // 处理秒或毫秒
     const date = new Date(num < 10000000000 ? num * 1000 : num);
-    return date.toLocaleString('zh-CN', { hour12: false });
+    return date.toLocaleString('en-US', { hour12: false });
   };
 
   return (
@@ -44,7 +48,7 @@ export default function TimestampConverter() {
           onClick={() => handleCopy(now.toString())}
           className="text-[10px] font-mono font-bold text-[#F97316] hover:underline"
         >
-          {now} · {copyLabel}
+          {now > 0 ? `${now} · ${copyLabel}` : copyLabel}
         </button>
       </div>
 

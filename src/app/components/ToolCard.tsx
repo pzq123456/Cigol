@@ -1,4 +1,5 @@
 // src/app/components/ToolCard.tsx
+import Link from 'next/link';
 import { ArrowTurnDownLeftIcon, CodeBracketIcon } from '@heroicons/react/20/solid';
 
 interface ToolCardProps {
@@ -10,7 +11,7 @@ interface ToolCardProps {
 
 export default function ToolCard({ href, title, description, icon }: ToolCardProps) {
   return (
-    <a
+    <Link
       href={href}
       className="group flex items-center justify-between p-4 rounded-xl border transition-all duration-300
         /* 浅色模式样式 */
@@ -30,6 +31,6 @@ export default function ToolCard({ href, title, description, icon }: ToolCardPro
         </div>
       </div>
       <ArrowTurnDownLeftIcon className="w-5 h-5 text-slate-300 dark:text-gray-500 group-hover:text-[#F97316] dark:group-hover:text-white group-hover:translate-x-1 transition-all" />
-    </a>
+    </Link>
   );
 }

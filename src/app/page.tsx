@@ -1,24 +1,35 @@
 import ClientClock from "./components/ClientClock";
-import Cube from "./components/Cube";
+import Cube from "../tools/cube";
 import ThemeToggle from "./components/ThemeToggle";
-import SubscriptionForm from "./components/SubscriptionForm";
 import ToolCard from "./components/ToolCard";
 import Logo from "./components/Logo";
 import Footer from "./components/Footer";
 import TimestampConverter from "./components/QuickUtils";
+import Link from "next/link";
+import { liveTools } from "../tools/registry";
+
+// Products hosted outside of this site.
+const externalTools = [
+  {
+    href: "https://geo.cigol.dev",
+    title: "Maption",
+    description: "The online SaaS platform for Geospatial Storytelling",
+    icon: "🗺️",
+  },
+];
 
 export default function Home() {
   const tools = [
-    {
-      href: "/beautifier",
-      title: "Code Snippet Beautifier",
-      description: "Transform your code into beautiful, shareable images",
-    },
-    {
-      href: "https://geo.cigol.dev",
-      title: "Maption",
-      description: "The online SaaS platform for Geospatial Storytelling",
-    },
+    ...liveTools.map((tool) => ({
+      href: `/tools/${tool.slug}`,
+      title: tool.title,
+      description: tool.description,
+      icon: <span className="text-2xl">{tool.icon}</span>,
+    })),
+    ...externalTools.map((tool) => ({
+      ...tool,
+      icon: <span className="text-2xl">{tool.icon}</span>,
+    })),
   ];
 
   return (
@@ -81,15 +92,21 @@ export default function Home() {
           </section>
 
           <section className="grid gap-3">
-            <h3 className="text-left text-xs font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-gray-500 ml-1">
-              Toys Cube
-            </h3>
+            <div className="flex items-center justify-between ml-1">
+              <h3 className="text-left text-xs font-bold uppercase tracking-[0.2em] text-slate-400 dark:text-gray-500">
+                Featured Tool
+              </h3>
+              <Link
+                href="/tools/cube"
+                className="text-xs font-bold uppercase tracking-[0.2em] text-[#F97316] hover:underline"
+              >
+                Open tool page →
+              </Link>
+            </div>
             <div className="w-full mb-12">
               <Cube />
             </div>
           </section>
-
-          <SubscriptionForm />
         </div>
       </main>
 
