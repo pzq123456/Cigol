@@ -27,6 +27,7 @@ export default function Footer() {
               <a 
                 href="https://github.com/pzq123456" 
                 target="_blank" 
+                rel="noopener noreferrer"
                 className="text-slate-400 dark:text-gray-600 hover:text-slate-900 dark:hover:text-white transition-colors"
                 aria-label="GitHub"
               >
@@ -37,6 +38,7 @@ export default function Footer() {
               <a 
                 href="https://x.com/cigol_dev" 
                 target="_blank" 
+                rel="noopener noreferrer"
                 className="text-slate-400 dark:text-gray-600 hover:text-[#F97316] transition-colors"
                 aria-label="X (Twitter)"
               >
